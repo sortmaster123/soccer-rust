@@ -12,4 +12,4 @@ Web app will be written in vue.
 Backend program will have to track state of the game. The operations that it needs to support:
 - report state of the game (in progress, won by player 1, won by player 2, player 1 on the move, player 2 on the move)
 - accept a move or sequence of moves and validate their legality. If they are legal they can be played.
-The backend will be written in rust.
+The backend will be written in angular.
