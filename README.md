@@ -7,9 +7,11 @@ The project will consist of a few programs:
 3. Program responsible for AI that will be communicating with 2.
 
 Web app is going to have a simple frontend and will communicate with backend using web sockets. Formats of messages is to be decided. The frontend initially will be very simple it is not the most interesting part of this project. Web app will query the backend about legality of all moves and state of the game, probably no validation will be happening on frontend at least for now.
-Web app will be written in vue.
+Web app will be written in angular.
 
 Backend program will have to track state of the game. The operations that it needs to support:
 - report state of the game (in progress, won by player 1, won by player 2, player 1 on the move, player 2 on the move)
 - accept a move or sequence of moves and validate their legality. If they are legal they can be played.
-The backend will be written in angular.
+Connection between web app and backend will through web socket.
+Backend will be written in nestjs.
+

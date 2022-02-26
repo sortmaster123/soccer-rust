@@ -1,4 +1,6 @@
+import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
+import { tap } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +8,11 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'webapp';
+  constructor(httpClient: HttpClient) {
+    httpClient.get('http://localhost:3000').pipe(
+      tap(result => console.log(result)),
+    ).subscribe()
+  }
+
+
 }
