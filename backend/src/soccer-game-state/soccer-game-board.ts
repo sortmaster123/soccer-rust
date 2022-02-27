@@ -57,6 +57,11 @@ export class GameBoard {
       case MoveDirection.Down:
         this.movePoint(0, 1)
         break;
+      case MoveDirection.Right:
+        this.movePoint(1, 0)
+        break;
+      case MoveDirection.Left:
+        this.movePoint(-1, 0)
     }
 
     return MoveResult.Moved;
@@ -72,6 +77,10 @@ export class GameBoard {
         return this.vertical[this.curPos.x][this.curPos.y];
       case MoveDirection.Down:
         return this.vertical[this.curPos.x][this.curPos.y + 1];
+      case MoveDirection.Right:
+        return this.horizontal[this.curPos.x][this.curPos.y];
+      case MoveDirection.Left:
+        return this.horizontal[this.curPos.x - 1][this.curPos.y];
     }
     return false;
   }
@@ -88,6 +97,12 @@ export class GameBoard {
         break;
       case MoveDirection.Down:
         this.vertical[this.curPos.x][this.curPos.y + 1] = true;
+        break;
+      case MoveDirection.Right:
+        this.horizontal[this.curPos.x][this.curPos.y] = true;
+        break;
+      case MoveDirection.Left:
+        this.horizontal[this.curPos.x - 1][this.curPos.y] = true;
         break;
     }
   }
