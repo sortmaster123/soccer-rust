@@ -1,9 +1,12 @@
 import { Injectable } from '@angular/core';
+import { Store } from '@ngxs/store';
 import { io, Socket } from 'socket.io-client';
 import { MoveDirection } from './pitch/pitch.component';
+import { AcceptMove } from './store/game-state.actions';
 
 type MoveResponse = {
   moveResult: MoveResult;
+  moveDirection: MoveDirection;
 }
 
 export enum MoveResult {
@@ -16,7 +19,9 @@ export enum MoveResult {
 })
 export class SocketService {
 
-  constructor() { 
+  constructor(
+    private readonly store: Store,
+  ) { 
     this.socket = io('http://localhost:3000');
   }
 
@@ -37,8 +42,13 @@ export class SocketService {
     //   console.log('socket events', data);
     // });
 
+    let store = this.store;
+
     socket.on('move', function(data) {
       let parsedData = data as MoveResponse;
+      if(parsedData.moveResult == MoveResult.Moved){
+        store.dispatch(new AcceptMove(parsedData.moveDirection));
+      }
       console.log('move result: ', data);
       console.log('move result: ', parsedData);
       console.log('move failure: ', parsedData.moveResult == MoveResult.AlreadyTaken);

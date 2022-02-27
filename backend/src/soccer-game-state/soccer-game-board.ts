@@ -14,6 +14,10 @@ export enum MoveResult {
   Moved,
 }
 
+export type MoveResponse = {
+  moveResult: MoveResult
+}
+
 export class GameBoard {
 
   private boardSizeX = 13;
@@ -39,7 +43,7 @@ export class GameBoard {
     }
   }
 
-  move(moveDir: MoveDirection): MoveResult{
+  move(moveDir: MoveDirection): MoveResult {
     if(this.checkIfEdgeMarked(moveDir)){
       return MoveResult.AlreadyTaken;
     }

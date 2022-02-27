@@ -1,8 +1,11 @@
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import { Actions, ofActionSuccessful, Store } from '@ngxs/store';
+import { tap } from 'rxjs';
 import { CanvasHelperService } from '../canvas-helper.service';
 import { SocketService } from '../socket.service';
+import { AcceptMove, InitializeGame } from '../store/game-state.actions';
 
-type Point = {
+export type Point = {
   x: number;
   y: number;
 }
@@ -10,8 +13,6 @@ type Point = {
 export enum MoveDirection {
   Up, Down, Left, Right, UpLeft, UpRight, DownLeft, DownRight
 }
-
-
 
 @Component({
   selector: 'app-pitch',
@@ -26,7 +27,19 @@ export class PitchComponent implements AfterViewInit {
   private currentPoint: Point = {x: 4, y: 5};
   private canvasHelper?: CanvasHelperService = undefined;
 
-  constructor(private readonly socketService: SocketService) {}
+  constructor(
+    private readonly socketService: SocketService,
+    private readonly store: Store,
+    private readonly actions$: Actions,
+  ) {
+    this.store.dispatch(new InitializeGame()).subscribe();
+    this.actions$
+      .pipe(
+        ofActionSuccessful(AcceptMove),
+        tap(move => this.moveDirection((move as AcceptMove).moveDirection))
+      )
+      .subscribe();
+  }
 
   private keyToAction(key: string): MoveDirection | undefined {
     switch(key) {
@@ -50,8 +63,12 @@ export class PitchComponent implements AfterViewInit {
     return undefined;
   }
 
-  private moveDirection(moveDirection: MoveDirection): boolean {
-    this.checkIfMoveIsLegal(moveDirection);
+  private moveDirection(moveDirection: MoveDirection) {
+    this.markAMove(moveDirection);
+    this.getCtx().stroke()
+  }
+
+  private markAMove(moveDirection: MoveDirection):boolean {
     switch(moveDirection) {
       case MoveDirection.Down:
         return this.move(0, 1);
@@ -98,11 +115,7 @@ export class PitchComponent implements AfterViewInit {
       console.log('unknown key', event.key, 'registered')
       return;
     }
-    this.moveDirection(action);
-
-    // FIXME: making stroke once draws half translucent lines- to be fixed by configuring drawing properly.
-    this.getCtx().stroke()
-    this.getCtx().stroke()
+    this.checkIfMoveIsLegal(action);
   }
 
   private move(xOffset: number, yOffset: number): boolean{
