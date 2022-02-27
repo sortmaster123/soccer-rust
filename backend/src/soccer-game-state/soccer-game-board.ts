@@ -77,7 +77,7 @@ export class GameBoard {
       };
     }
 
-    let legality = this.checkForLegalityIssues(moveDir)
+    let legality = this.checkIfMoveIsInBounds(moveDir)
     if(legality != undefined){
       return legality;
     }
@@ -98,7 +98,7 @@ export class GameBoard {
     };
   }
 
-  private checkForLegalityIssues(moveDir: MoveDirection): MoveResponse | undefined {
+  private checkIfMoveIsInBounds(moveDir: MoveDirection): MoveResponse | undefined {
     let curPoint = this.getCords()
     let offset = this.directionToOffset(moveDir)
     let newPoint = {
@@ -113,22 +113,31 @@ export class GameBoard {
       }
     }
 
+    if((newPoint.y < 1 || newPoint.y > 11) && newPoint.x != 4 && newPoint.x != 5 && newPoint.x !== 6){
+      return {
+        gameState: GameResult.ContinueMove,
+        moveResult: MoveResult.InvalidMove,
+      }
+    }
+
     return undefined;
   }
 
   private checkForWin(): MoveResponse | undefined {
     let curPos = this.getCords();
 
-    if(curPos.y == 0 && (curPos.x == 4 || curPos.x == 5 || curPos.x == 6)){
-      console.log('declare win')
+    if(curPos.x !== 4 && curPos.x !== 5 && curPos.x !== 6){
+      return undefined;
+    }
+
+    if(curPos.y == 0){
       return {
         moveResult: MoveResult.Moved,
         gameState: GameResult.P1Win,
       }
     }
 
-    if(curPos.y == 12 && (curPos.x == 4 || curPos.x == 5 || curPos.x == 6)){
-      console.log('declare win')
+    if(curPos.y == 12){
       return {
         moveResult: MoveResult.Moved,
         gameState: GameResult.P2Win,

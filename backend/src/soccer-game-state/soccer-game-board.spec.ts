@@ -52,6 +52,7 @@ describe('GameBoard', () => {
     });
   })
 
+
   describe('move validity', () => {
 
     beforeEach(() => service.initializeGame());
@@ -141,6 +142,36 @@ describe('GameBoard', () => {
         moveResult: MoveResult.InvalidMove,
       });
       assertPositionIs(1, 6);
+    })
+
+    it('should not allow going out of bounds through top', () => {
+      service.move(MoveDirection.UpLeft);
+      service.move(MoveDirection.UpLeft);
+      service.move(MoveDirection.Up);
+      service.move(MoveDirection.Up);
+      service.move(MoveDirection.Up);
+      assertPositionIs(3, 1);
+
+      expect(service.move(MoveDirection.Up)).toEqual({
+        gameState: GameResult.ContinueMove,
+        moveResult: MoveResult.InvalidMove,
+      });
+      assertPositionIs(3, 1);
+    })
+
+    it('should not allow going out of bounds through bottom', () => {
+      service.move(MoveDirection.DownRight);
+      service.move(MoveDirection.DownRight);
+      service.move(MoveDirection.Down);
+      service.move(MoveDirection.Down);
+      service.move(MoveDirection.Down);
+      assertPositionIs(7, 11);
+
+      expect(service.move(MoveDirection.Down)).toEqual({
+        gameState: GameResult.ContinueMove,
+        moveResult: MoveResult.InvalidMove,
+      });
+      assertPositionIs(7, 11);
     })
   })
 
