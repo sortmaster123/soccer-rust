@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { GameBoard, GameState, MoveDirection, MoveResult } from './soccer-game-board';
+import { GameBoard, GameResult, MoveDirection, MoveResult } from './soccer-game-board';
 
 describe('GameBoard', () => {
   let service: GameBoard;
@@ -15,32 +15,41 @@ describe('GameBoard', () => {
   describe('game state', () => {
     beforeEach(() => service.initializeGame());
 
-    it('should declare a P1 win', () => {
+    it.each([
+      [ MoveDirection.UpLeft, 4, 0 ],
+      [ MoveDirection.Up, 5, 0 ],
+      [ MoveDirection.UpRight, 6, 0 ],
+    ])
+    ('should return p1 win for finishing with %s in (%d,%d)', (moveDirection, resultX, resultY) => {
       for(let i = 0; i < 5; i ++){
-        expect(service.move(MoveDirection.Up)).toEqual({moveResult: MoveResult.Moved, gameState: GameState.ContinueMove });
+        expect(service.move(MoveDirection.Up)).toEqual({moveResult: MoveResult.Moved, gameState: GameResult.ContinueMove });
       }
 
-      let result = service.move(MoveDirection.Up);
+      let result = service.move(moveDirection);
+      assertPositionIs(resultX, resultY);
       expect(result).toEqual({
           moveResult: MoveResult.Moved,
-          gameState: GameState.P1Win,
-        });
-      assertPositionIs(5, 0);
-    })
+          gameState: GameResult.P1Win,
+      });
+    });
 
-    it('should declare a P2 win', () => {
+    it.each([
+      [ MoveDirection.DownLeft, 4, 12 ],
+      [ MoveDirection.Down, 5, 12 ],
+      [ MoveDirection.DownRight, 6, 12 ],
+    ])
+    ('should return p2 win for finishing with %s in (%d,%d)', (moveDirection, resultX, resultY) => {
       for(let i = 0; i < 5; i ++){
-        expect(service.move(MoveDirection.Down)).toEqual({moveResult: MoveResult.Moved, gameState: GameState.ContinueMove });
+        expect(service.move(MoveDirection.Down)).toEqual({moveResult: MoveResult.Moved, gameState: GameResult.ContinueMove });
       }
 
-      let result = service.move(MoveDirection.Down);
-      assertPositionIs(5, 12);
+      let result = service.move(moveDirection);
+      assertPositionIs(resultX, resultY);
       expect(result).toEqual({
           moveResult: MoveResult.Moved,
-          gameState: GameState.P2Win,
-        });
-      
-    })
+          gameState: GameResult.P2Win,
+      });
+    });
   })
 
   describe('move validity', () => {
@@ -76,12 +85,22 @@ describe('GameBoard', () => {
       assertPositionIs(5, 7);
     });
 
-    it('should be able to move down', () => {
-      let moveResult = service.move(MoveDirection.Down);
-      expect(moveResult.moveResult).toEqual(MoveResult.Moved);
+    it.each([
+      [ MoveDirection.Up, MoveDirection.Down ],
+      [ MoveDirection.Down, MoveDirection.Up ],
+      [ MoveDirection.Left, MoveDirection.Right ],
+      [ MoveDirection.Right, MoveDirection.Left ],
+      [ MoveDirection.UpLeft, MoveDirection.DownRight ],
+      [ MoveDirection.DownRight, MoveDirection.UpLeft ],
+      [ MoveDirection.UpRight, MoveDirection.DownLeft ],
+      [ MoveDirection.DownLeft, MoveDirection.UpRight ],
+    ])
+    ('should not allow series of moves %s, %s', (move1Direction, move2Direction) => {
+      expect(service.move(move1Direction).moveResult).toEqual(MoveResult.Moved);
+      expect(service.move(move2Direction).moveResult).toEqual(MoveResult.AlreadyTaken);
     });
 
-    it('should not be able to move down and then up', () => {
+    it('should be able to move down', () => {
       let moveResult = service.move(MoveDirection.Down);
       expect(moveResult.moveResult).toEqual(MoveResult.Moved);
     });
@@ -90,37 +109,6 @@ describe('GameBoard', () => {
       service.move(MoveDirection.Down);
       let moveResult = service.move(MoveDirection.Down);
       expect(moveResult.moveResult).toEqual(MoveResult.Moved);
-    });
-
-
-    it('test left right movement', () => {
-      expect(service.move(MoveDirection.Left).moveResult).toEqual(MoveResult.Moved);
-      expect(service.move(MoveDirection.Right).moveResult).toEqual(MoveResult.AlreadyTaken);
-    });
-
-    it('test right left movement', () => {
-      expect(service.move(MoveDirection.Right).moveResult).toEqual(MoveResult.Moved);
-      expect(service.move(MoveDirection.Left).moveResult).toEqual(MoveResult.AlreadyTaken);
-    });
-
-    it('test slash up down movement', () => {
-      expect(service.move(MoveDirection.UpRight).moveResult).toEqual(MoveResult.Moved);
-      expect(service.move(MoveDirection.DownLeft).moveResult).toEqual(MoveResult.AlreadyTaken);
-    });
-
-    it('test slash down up movement', () => {
-      expect(service.move(MoveDirection.DownLeft).moveResult).toEqual(MoveResult.Moved);
-      expect(service.move(MoveDirection.UpRight).moveResult).toEqual(MoveResult.AlreadyTaken);
-    });
-
-    it('test backslash up down movement', () => {
-      expect(service.move(MoveDirection.UpLeft).moveResult).toEqual(MoveResult.Moved);
-      expect(service.move(MoveDirection.DownRight).moveResult).toEqual(MoveResult.AlreadyTaken);
-    });
-
-    it('test backslash down up movement', () => {
-      expect(service.move(MoveDirection.DownRight).moveResult).toEqual(MoveResult.Moved);
-      expect(service.move(MoveDirection.UpLeft).moveResult).toEqual(MoveResult.AlreadyTaken);
     });
   });
 

@@ -1,3 +1,4 @@
+import { check } from "prettier";
 import { Direction } from "readline";
 
 type Point = {
@@ -80,8 +81,21 @@ export class GameBoard {
     let offsets = this.directionToOffset(moveDir);
     this.movePoint(offsets.x, offsets.y);
 
+    let hasWin = this.checkForWin();
+    if(hasWin != undefined){
+      return hasWin;
+    }
+
+    return {
+      moveResult: MoveResult.Moved,
+      gameState: GameResult.ContinueMove,
+    };
+  }
+
+  private checkForWin(): MoveResponse | undefined {
     let curPos = this.getCords();
-    if(curPos.x == 5 && curPos.y == 0){
+
+    if(curPos.y == 0 && (curPos.x == 4 || curPos.x == 5 || curPos.x == 6)){
       console.log('declare win')
       return {
         moveResult: MoveResult.Moved,
@@ -89,18 +103,14 @@ export class GameBoard {
       }
     }
 
-    if(curPos.x == 5 && curPos.y == 12){
+    if(curPos.y == 12 && (curPos.x == 4 || curPos.x == 5 || curPos.x == 6)){
       console.log('declare win')
       return {
         moveResult: MoveResult.Moved,
         gameState: GameResult.P2Win,
       }
     }
-
-    return {
-      moveResult: MoveResult.Moved,
-      gameState: GameResult.ContinueMove,
-    };
+    return undefined;
   }
 
   getCords(): Point{

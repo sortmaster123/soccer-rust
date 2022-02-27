@@ -71,11 +71,12 @@ export class PitchComponent implements AfterViewInit {
   }
 
   private moveDirection(moveDirection: MoveDirection) {
+    console.log('moving in direction', moveDirection)
     this.markAMove(moveDirection);
     this.getCtx().stroke()
   }
 
-  private markAMove(moveDirection: MoveDirection):boolean {
+  private markAMove(moveDirection: MoveDirection): boolean {
     switch(moveDirection) {
       case MoveDirection.Down:
         return this.move(0, 1);
@@ -91,10 +92,9 @@ export class PitchComponent implements AfterViewInit {
         return this.move(1, -1);
       case MoveDirection.DownLeft:
         return this.move(-1, 1);
-      case MoveDirection.DownRight:
+      case MoveDirection.UpLeft:
         return this.move(-1, -1);
     }
-    return false;
   }
 
   ngAfterViewInit(): void {
