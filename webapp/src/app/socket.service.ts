@@ -29,30 +29,14 @@ export class SocketService {
 
   connect() {
     let socket = this.socket;
-    
-    // socket.on('connect', function() {
-    //   console.log('pitch Connected');
-
-    //   socket.emit('events', { test: 'test23' });
-    //   // socket.emit('identity', 145, response =>
-    //   //   console.log('Identity:', response),
-    //   // );
-    // });
-    // socket.on('events', function(data) {
-    //   console.log('socket events', data);
-    // });
-
     let store = this.store;
 
     socket.on('move', function(data) {
       let parsedData = data as MoveResponse;
       if(parsedData.moveResult == MoveResult.Moved){
+        console.log('received move confirmation: ', data);
         store.dispatch(new AcceptMove(parsedData.moveDirection));
       }
-      console.log('move result: ', data);
-      console.log('move result: ', parsedData);
-      console.log('move failure: ', parsedData.moveResult == MoveResult.AlreadyTaken);
-      console.log('move success: ', parsedData.moveResult == MoveResult.Moved);
     });
 
     socket.on('exception', function(data) {
@@ -64,6 +48,11 @@ export class SocketService {
   }
 
   tryMove(movedir: MoveDirection) {
+    console.log('sending move request: ', movedir);
     this.socket.emit('move', {moveDirection: movedir});
+  }
+
+  requestNewGame() {
+    this.socket.emit('newgame');
   }
 }

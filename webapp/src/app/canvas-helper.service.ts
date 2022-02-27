@@ -16,7 +16,6 @@ export class CanvasHelperService {
     this.ctx.fillStyle = "#FFFFFF";
     this.ctx.strokeStyle = 'white';
     this.ctx.lineWidth = 1;
-    console.log(this.ctx.globalAlpha)
   }
 
   public drawPoint(x: number, y: number){

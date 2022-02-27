@@ -66,5 +66,36 @@ describe('GameBoard', () => {
       let moveResult = service.move(MoveDirection.Down);
       expect(moveResult).toEqual(MoveResult.Moved);
     });
+
+
+    it('test left right movement', () => {
+      expect(service.move(MoveDirection.Left)).toEqual(MoveResult.Moved);
+      expect(service.move(MoveDirection.Right)).toEqual(MoveResult.AlreadyTaken);
+    });
+
+    it('test right left movement', () => {
+      expect(service.move(MoveDirection.Right)).toEqual(MoveResult.Moved);
+      expect(service.move(MoveDirection.Left)).toEqual(MoveResult.AlreadyTaken);
+    });
+
+    it('test slash up down movement', () => {
+      expect(service.move(MoveDirection.UpRight)).toEqual(MoveResult.Moved);
+      expect(service.move(MoveDirection.DownLeft)).toEqual(MoveResult.AlreadyTaken);
+    });
+
+    it('test slash down up movement', () => {
+      expect(service.move(MoveDirection.DownLeft)).toEqual(MoveResult.Moved);
+      expect(service.move(MoveDirection.UpRight)).toEqual(MoveResult.AlreadyTaken);
+    });
+
+    it('test backslash up down movement', () => {
+      expect(service.move(MoveDirection.UpLeft)).toEqual(MoveResult.Moved);
+      expect(service.move(MoveDirection.DownRight)).toEqual(MoveResult.AlreadyTaken);
+    });
+
+    it('test backslash down up movement', () => {
+      expect(service.move(MoveDirection.DownRight)).toEqual(MoveResult.Moved);
+      expect(service.move(MoveDirection.UpLeft)).toEqual(MoveResult.AlreadyTaken);
+    });
   });
 });

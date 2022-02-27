@@ -11,7 +11,14 @@ export type Point = {
 }
 
 export enum MoveDirection {
-  Up, Down, Left, Right, UpLeft, UpRight, DownLeft, DownRight
+  Up = "Up",
+  Down = "Down",
+  Left = "Left",
+  Right = "Right", 
+  UpLeft = "UpLeft", 
+  UpRight = "UpRight",
+  DownLeft = "DownLeft",
+  DownRight = "DownRight"
 }
 
 @Component({
@@ -58,7 +65,7 @@ export class PitchComponent implements AfterViewInit {
       case 'End':
         return MoveDirection.DownLeft;
       case 'Home':
-        return MoveDirection.DownRight;
+        return MoveDirection.UpLeft;
     }
     return undefined;
   }
@@ -105,6 +112,7 @@ export class PitchComponent implements AfterViewInit {
     }
 
     this.socketService.connect();
+    this.socketService.requestNewGame();
   }
 
   // TODO: move to main component and process in store
