@@ -5,10 +5,10 @@ import { MoveDirection } from './pitch/pitch.component';
 import { ReceiveMove } from './store/game-state.actions';
 
 export enum GameResult {
-  SwitchPlayers,
-  ContinueMove,
-  P1Win,
-  P2Win,
+  SwitchPlayers = 'SwitchPlayers',
+  ContinueMove = 'ContinueMove',
+  P1Win = 'P1Win',
+  P2Win = 'P2Win',
 }
 
 export type MoveResponse = {
@@ -18,8 +18,8 @@ export type MoveResponse = {
 }
 
 export enum MoveResult {
-  AlreadyTaken,
-  Moved,
+  AlreadyTaken = 'AlreadyTaken',
+  Moved = 'Moved',
 }
 
 @Injectable({

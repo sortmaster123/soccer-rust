@@ -17,15 +17,15 @@ export enum MoveDirection {
 }
 
 export enum MoveResult {
-  AlreadyTaken,
-  Moved,
+  AlreadyTaken = 'AlreadyTaken',
+  Moved = 'Moved',
 }
 
 export enum GameResult {
-  SwitchPlayers,
-  ContinueMove,
-  P1Win,
-  P2Win,
+  SwitchPlayers = 'SwitchPlayers',
+  ContinueMove = 'ContinueMove',
+  P1Win = 'P1Win',
+  P2Win = 'P2Win',
 }
 
 export type MoveResponse = {
