@@ -21,8 +21,16 @@ export enum MoveResult {
   Moved,
 }
 
+export enum GameState {
+  SwitchPlayers,
+  ContinueMove,
+  P1Win,
+  P2Win,
+}
+
 export type MoveResponse = {
-  moveResult: MoveResult
+  moveResult: MoveResult,
+  gameState: GameState,
 }
 
 export class GameBoard {
@@ -39,7 +47,7 @@ export class GameBoard {
   constructor() { this.initializeGame() }
 
   initializeGame(){
-    this.curPos = {x: 5, y: 5};
+    this.curPos = {x: 5, y: 6};
     this.vertical = [];
     this.horizontal = [];
     this.backslash = [];
@@ -59,48 +67,45 @@ export class GameBoard {
     console.log('start game point in ', this.getCords())
   }
 
-  move(moveDir: MoveDirection): MoveResult {
-    if(this.checkIfEdgeMarked(moveDir)){
-      return MoveResult.AlreadyTaken;
+  move(moveDir: MoveDirection): MoveResponse {
+    if(this.isEdgeAlreadyMarked(moveDir)){
+      return {
+        moveResult: MoveResult.AlreadyTaken,
+        gameState: GameState.ContinueMove,
+      };
     }
 
     this.markEdge(moveDir);
     
-    switch(moveDir){
-      case MoveDirection.Up:
-        this.movePoint(0, -1)
-        break;
-      case MoveDirection.Down:
-        this.movePoint(0, 1)
-        break;
-      case MoveDirection.Right:
-        this.movePoint(1, 0)
-        break;
-      case MoveDirection.Left:
-        this.movePoint(-1, 0)
-        break;
-      case MoveDirection.UpRight:
-        this.movePoint(1, -1)
-        break;
-      case MoveDirection.DownLeft:
-        this.movePoint(-1, 1);
-        break;
-      case MoveDirection.UpLeft:
-        this.movePoint(-1, -1);
-        break;
-      case MoveDirection.DownRight:
-        this.movePoint(1, 1);
-        break;
+    let offsets = this.directionToOffset(moveDir);
+    this.movePoint(offsets.x, offsets.y);
+
+    let curPos = this.getCords();
+    if(curPos.x == 5 && curPos.y == 0){
+      return {
+        moveResult: MoveResult.Moved,
+        gameState: GameState.P1Win,
+      }
     }
 
-    return MoveResult.Moved;
+    if(curPos.x == 5 && curPos.y == 12){
+      return {
+        moveResult: MoveResult.Moved,
+        gameState: GameState.P2Win,
+      }
+    }
+
+    return {
+      moveResult: MoveResult.Moved,
+      gameState: GameState.ContinueMove,
+    };
   }
 
   getCords(): Point{
     return {...this.curPos};
   }
 
-  private checkIfEdgeMarked(moveDir: MoveDirection): boolean {
+  private isEdgeAlreadyMarked(moveDir: MoveDirection): boolean {
     switch(moveDir){
       case MoveDirection.Up:
         return this.vertical[this.curPos.x][this.curPos.y];
@@ -120,6 +125,27 @@ export class GameBoard {
         return this.backslash[this.curPos.x + 1][this.curPos.y + 1];
     }
     return false;
+  }
+
+  private directionToOffset(moveDirection: MoveDirection): Point {
+    switch(moveDirection){
+      case MoveDirection.Up:
+        return {x: 0, y: -1};
+      case MoveDirection.Down:
+        return {x: 0, y: 1};
+      case MoveDirection.Right:
+        return {x: 1, y: 0};
+      case MoveDirection.Left:
+        return {x: -1, y: 0};
+      case MoveDirection.UpRight:
+        return {x: 1, y: -1};
+      case MoveDirection.DownLeft:
+        return {x: -1, y: 1};
+      case MoveDirection.UpLeft:
+        return {x: -1, y: -1};
+      case MoveDirection.DownRight:
+        return {x: 1, y: 1};
+    }
   }
 
   private movePoint(xOffset: number, yOffset: number){

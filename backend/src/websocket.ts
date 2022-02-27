@@ -38,7 +38,7 @@ export class EventsGateway {
   move(@MessageBody() data: MoveRequest): Observable<WsResponse<MoveResponse>> {
     console.log('received move event: ', data)
     let moveResult = this.gameBoard.move(data.moveDirection);
-    return of(true).pipe(map(_ => ({ event: 'move', data: { moveResult, moveDirection: data.moveDirection }})));
+    return of(true).pipe(map(_ => ({ event: 'move', data: { moveResult: moveResult.moveResult, moveDirection: data.moveDirection }})));
   }
 
   @SubscribeMessage('newgame')
