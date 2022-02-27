@@ -112,6 +112,38 @@ describe('GameBoard', () => {
     });
   });
 
+  describe('boundary safety', () => {
+    beforeEach(() => service.initializeGame())
+
+    it('should not allow going out of bounds to the right', () => {
+      service.move(MoveDirection.Right);
+      service.move(MoveDirection.Right);
+      service.move(MoveDirection.Right);
+      service.move(MoveDirection.Right);
+      assertPositionIs(9, 6);
+
+      expect(service.move(MoveDirection.Right)).toEqual({
+        gameState: GameResult.ContinueMove,
+        moveResult: MoveResult.InvalidMove,
+      });
+      assertPositionIs(9, 6);
+    })
+
+    it('should not allow going out of bounds to the left', () => {
+      service.move(MoveDirection.Left);
+      service.move(MoveDirection.Left);
+      service.move(MoveDirection.Left);
+      service.move(MoveDirection.Left);
+      assertPositionIs(1, 6);
+
+      expect(service.move(MoveDirection.Left)).toEqual({
+        gameState: GameResult.ContinueMove,
+        moveResult: MoveResult.InvalidMove,
+      });
+      assertPositionIs(1, 6);
+    })
+  })
+
   function assertPositionIs(x: number, y: number){
     let curPos = service.getCords();
     expect(curPos.x).toEqual(x);

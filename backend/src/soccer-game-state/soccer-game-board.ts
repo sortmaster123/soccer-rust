@@ -20,6 +20,7 @@ export enum MoveDirection {
 export enum MoveResult {
   AlreadyTaken = 'AlreadyTaken',
   Moved = 'Moved',
+  InvalidMove = 'InvalidMove'
 }
 
 export enum GameResult {
@@ -76,6 +77,11 @@ export class GameBoard {
       };
     }
 
+    let legality = this.checkForLegalityIssues(moveDir)
+    if(legality != undefined){
+      return legality;
+    }
+
     this.markEdge(moveDir);
     
     let offsets = this.directionToOffset(moveDir);
@@ -90,6 +96,24 @@ export class GameBoard {
       moveResult: MoveResult.Moved,
       gameState: GameResult.ContinueMove,
     };
+  }
+
+  private checkForLegalityIssues(moveDir: MoveDirection): MoveResponse | undefined {
+    let curPoint = this.getCords()
+    let offset = this.directionToOffset(moveDir)
+    let newPoint = {
+      x: curPoint.x + offset.x,
+      y: curPoint.y + offset.y
+    }
+
+    if(newPoint.x > 9 || newPoint.x < 1){
+      return {
+        gameState: GameResult.ContinueMove,
+        moveResult: MoveResult.InvalidMove,
+      }
+    }
+
+    return undefined;
   }
 
   private checkForWin(): MoveResponse | undefined {
