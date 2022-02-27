@@ -2,11 +2,19 @@ import { Injectable } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { io, Socket } from 'socket.io-client';
 import { MoveDirection } from './pitch/pitch.component';
-import { AcceptMove } from './store/game-state.actions';
+import { ReceiveMove } from './store/game-state.actions';
 
-type MoveResponse = {
+export enum GameResult {
+  SwitchPlayers,
+  ContinueMove,
+  P1Win,
+  P2Win,
+}
+
+export type MoveResponse = {
   moveResult: MoveResult;
   moveDirection: MoveDirection;
+  gameState: GameResult;
 }
 
 export enum MoveResult {
@@ -32,11 +40,7 @@ export class SocketService {
     let store = this.store;
 
     socket.on('move', function(data) {
-      let parsedData = data as MoveResponse;
-      if(parsedData.moveResult == MoveResult.Moved){
-        console.log('received move confirmation: ', data);
-        store.dispatch(new AcceptMove(parsedData.moveDirection));
-      }
+      store.dispatch(new ReceiveMove(data as MoveResponse));
     });
 
     socket.on('exception', function(data) {

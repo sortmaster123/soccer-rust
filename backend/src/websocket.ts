@@ -8,7 +8,7 @@ import {
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Server } from 'socket.io';
-import { GameBoard, MoveDirection, MoveResult } from './soccer-game-state/soccer-game-board';
+import { GameBoard, GameResult, MoveDirection, MoveResult } from './soccer-game-state/soccer-game-board';
 
 type MoveRequest = {
   moveDirection: MoveDirection;
@@ -17,6 +17,7 @@ type MoveRequest = {
 type MoveResponse = {
   moveResult: MoveResult;
   moveDirection: MoveDirection;
+  gameState: GameResult;
 }
 
 @WebSocketGateway({
@@ -36,9 +37,8 @@ export class EventsGateway {
 
   @SubscribeMessage('move')
   move(@MessageBody() data: MoveRequest): Observable<WsResponse<MoveResponse>> {
-    console.log('received move event: ', data)
     let moveResult = this.gameBoard.move(data.moveDirection);
-    return of(true).pipe(map(_ => ({ event: 'move', data: { moveResult: moveResult.moveResult, moveDirection: data.moveDirection }})));
+    return of(true).pipe(map(_ => ({ event: 'move', data: { ...moveResult, moveDirection: data.moveDirection }})));
   }
 
   @SubscribeMessage('newgame')

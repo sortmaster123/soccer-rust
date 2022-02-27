@@ -3,7 +3,7 @@ import { Actions, ofActionSuccessful, Store } from '@ngxs/store';
 import { tap } from 'rxjs';
 import { CanvasHelperService } from '../canvas-helper.service';
 import { SocketService } from '../socket.service';
-import { AcceptMove, InitializeGame } from '../store/game-state.actions';
+import { DrawMove, InitializeGame } from '../store/game-state.actions';
 
 export type Point = {
   x: number;
@@ -31,7 +31,7 @@ export class PitchComponent implements AfterViewInit {
   private myCanvas: ElementRef = {} as ElementRef;
 
   private initialized = false;
-  private currentPoint: Point = {x: 4, y: 5};
+  private currentPoint: Point = {x: 4, y: 6};
   private canvasHelper?: CanvasHelperService = undefined;
 
   constructor(
@@ -42,8 +42,8 @@ export class PitchComponent implements AfterViewInit {
     this.store.dispatch(new InitializeGame()).subscribe();
     this.actions$
       .pipe(
-        ofActionSuccessful(AcceptMove),
-        tap(move => this.moveDirection((move as AcceptMove).moveDirection))
+        ofActionSuccessful(DrawMove),
+        tap(move => this.moveDirection((move as DrawMove).moveDirection))
       )
       .subscribe();
   }

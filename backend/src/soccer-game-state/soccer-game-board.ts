@@ -21,7 +21,7 @@ export enum MoveResult {
   Moved,
 }
 
-export enum GameState {
+export enum GameResult {
   SwitchPlayers,
   ContinueMove,
   P1Win,
@@ -30,7 +30,7 @@ export enum GameState {
 
 export type MoveResponse = {
   moveResult: MoveResult,
-  gameState: GameState,
+  gameState: GameResult,
 }
 
 export class GameBoard {
@@ -71,7 +71,7 @@ export class GameBoard {
     if(this.isEdgeAlreadyMarked(moveDir)){
       return {
         moveResult: MoveResult.AlreadyTaken,
-        gameState: GameState.ContinueMove,
+        gameState: GameResult.ContinueMove,
       };
     }
 
@@ -82,22 +82,24 @@ export class GameBoard {
 
     let curPos = this.getCords();
     if(curPos.x == 5 && curPos.y == 0){
+      console.log('declare win')
       return {
         moveResult: MoveResult.Moved,
-        gameState: GameState.P1Win,
+        gameState: GameResult.P1Win,
       }
     }
 
     if(curPos.x == 5 && curPos.y == 12){
+      console.log('declare win')
       return {
         moveResult: MoveResult.Moved,
-        gameState: GameState.P2Win,
+        gameState: GameResult.P2Win,
       }
     }
 
     return {
       moveResult: MoveResult.Moved,
-      gameState: GameState.ContinueMove,
+      gameState: GameResult.ContinueMove,
     };
   }
 
