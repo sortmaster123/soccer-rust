@@ -1,13 +1,6 @@
 export type MoveResponse = {
     moveResult: MoveResult,
-    gameState: GameResult,
-}
-
-export enum GameResult {
-  SwitchPlayers = 'SwitchPlayers',
-  ContinueMove = 'ContinueMove',
-  P1Win = 'P1Win',
-  P2Win = 'P2Win',
+    gameState: 'P1Win' | 'P2Win' | 'P1OnTheMove' | 'P2OnTheMove'
 }
 
 export enum MoveResult {

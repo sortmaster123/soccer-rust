@@ -8,18 +8,14 @@ import {
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Server } from 'socket.io';
-import { GameResult, MoveDirection, MoveResult } from './models/models';
+import { MoveDirection,MoveResponse } from './models/models';
 import { GameBoard } from './soccer-game-state/soccer-game-board';
 
 type MoveRequest = {
   moveDirection: MoveDirection;
 }
 
-type MoveResponse = {
-  moveResult: MoveResult;
-  moveDirection: MoveDirection;
-  gameState: GameResult;
-}
+type SocketMoveResponse = MoveResponse & {moveDirection: MoveDirection};
 
 @WebSocketGateway({
   cors: {
@@ -37,7 +33,7 @@ export class EventsGateway {
   server: Server;
 
   @SubscribeMessage('move')
-  move(@MessageBody() data: MoveRequest): Observable<WsResponse<MoveResponse>> {
+  move(@MessageBody() data: MoveRequest): Observable<WsResponse<SocketMoveResponse>> {
     let moveResult = this.gameBoard.move(data.moveDirection);
     return of(true).pipe(map(_ => ({ event: 'move', data: { ...moveResult, moveDirection: data.moveDirection }})));
   }

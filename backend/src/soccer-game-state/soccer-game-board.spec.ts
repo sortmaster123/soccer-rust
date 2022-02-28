@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GameBoard } from './soccer-game-board';
-import { GameResult, MoveDirection, MoveResult } from '../models/models';
+import { MoveDirection, MoveResult } from '../models/models';
 
 describe('GameBoard', () => {
   let service: GameBoard;
@@ -23,14 +23,14 @@ describe('GameBoard', () => {
     ])
     ('should return p1 win for finishing with %s in (%d,%d)', (moveDirection, resultX, resultY) => {
       for(let i = 0; i < 5; i ++){
-        expect(service.move(MoveDirection.Up)).toEqual({moveResult: MoveResult.Moved, gameState: GameResult.ContinueMove });
+        expect(service.move(MoveDirection.Up).moveResult).toEqual(MoveResult.Moved);
       }
 
       let result = service.move(moveDirection);
       assertPositionIs(resultX, resultY);
       expect(result).toEqual({
           moveResult: MoveResult.Moved,
-          gameState: GameResult.P1Win,
+          gameState: 'P1Win',
       });
     });
 
@@ -41,14 +41,14 @@ describe('GameBoard', () => {
     ])
     ('should return p2 win for finishing with %s in (%d,%d)', (moveDirection, resultX, resultY) => {
       for(let i = 0; i < 5; i ++){
-        expect(service.move(MoveDirection.Down)).toEqual({moveResult: MoveResult.Moved, gameState: GameResult.ContinueMove });
+        expect(service.move(MoveDirection.Down).moveResult).toEqual(MoveResult.Moved);
       }
 
       let result = service.move(moveDirection);
       assertPositionIs(resultX, resultY);
       expect(result).toEqual({
           moveResult: MoveResult.Moved,
-          gameState: GameResult.P2Win,
+          gameState: 'P2Win',
       });
     });
   })
@@ -57,37 +57,37 @@ describe('GameBoard', () => {
     beforeEach(() => service.initializeGame())
     
     it('should flip player after move to unvisited node', () => {
-      expect(service.getPlayerOnTheMove()).toEqual('P1')
+      expect(service.getPlayerOnTheMove()).toEqual('P1OnTheMove')
       service.move(MoveDirection.Up)
-      expect(service.getPlayerOnTheMove()).toEqual('P2')
+      expect(service.getPlayerOnTheMove()).toEqual('P2OnTheMove')
       service.move(MoveDirection.Up)
-      expect(service.getPlayerOnTheMove()).toEqual('P1')
+      expect(service.getPlayerOnTheMove()).toEqual('P1OnTheMove')
       service.move(MoveDirection.Right)
-      expect(service.getPlayerOnTheMove()).toEqual('P2')
+      expect(service.getPlayerOnTheMove()).toEqual('P2OnTheMove')
       service.move(MoveDirection.Down)
-      expect(service.getPlayerOnTheMove()).toEqual('P1')
+      expect(service.getPlayerOnTheMove()).toEqual('P1OnTheMove')
     })
 
     it('should not flip player after move to visited node', () => {
-      expect(service.getPlayerOnTheMove()).toEqual('P1')
+      expect(service.getPlayerOnTheMove()).toEqual('P1OnTheMove')
       service.move(MoveDirection.Up)
-      expect(service.getPlayerOnTheMove()).toEqual('P2')
+      expect(service.getPlayerOnTheMove()).toEqual('P2OnTheMove')
       service.move(MoveDirection.Left)
-      expect(service.getPlayerOnTheMove()).toEqual('P1')
+      expect(service.getPlayerOnTheMove()).toEqual('P1OnTheMove')
       service.move(MoveDirection.DownRight)
-      expect(service.getPlayerOnTheMove()).toEqual('P1')
+      expect(service.getPlayerOnTheMove()).toEqual('P1OnTheMove')
     })
 
     it('should not flip player after move to border', () => {
-      expect(service.getPlayerOnTheMove()).toEqual('P1')
+      expect(service.getPlayerOnTheMove()).toEqual('P1OnTheMove')
       service.move(MoveDirection.Right)
-      expect(service.getPlayerOnTheMove()).toEqual('P2')
+      expect(service.getPlayerOnTheMove()).toEqual('P2OnTheMove')
       service.move(MoveDirection.Right)
-      expect(service.getPlayerOnTheMove()).toEqual('P1')
+      expect(service.getPlayerOnTheMove()).toEqual('P1OnTheMove')
       service.move(MoveDirection.Right).moveResult
-      expect(service.getPlayerOnTheMove()).toEqual('P2')
+      expect(service.getPlayerOnTheMove()).toEqual('P2OnTheMove')
       service.move(MoveDirection.Right)
-      expect(service.getPlayerOnTheMove()).toEqual('P2')
+      expect(service.getPlayerOnTheMove()).toEqual('P2OnTheMove')
     })
   })
 
@@ -162,10 +162,7 @@ describe('GameBoard', () => {
       service.move(MoveDirection.Right);
       assertPositionIs(9, 6);
 
-      expect(service.move(MoveDirection.Right)).toEqual({
-        gameState: GameResult.ContinueMove,
-        moveResult: MoveResult.InvalidMove,
-      });
+      expect(service.move(MoveDirection.Right).moveResult).toEqual(MoveResult.InvalidMove);
       assertPositionIs(9, 6);
     })
 
@@ -176,10 +173,7 @@ describe('GameBoard', () => {
       service.move(MoveDirection.Left);
       assertPositionIs(1, 6);
 
-      expect(service.move(MoveDirection.Left)).toEqual({
-        gameState: GameResult.ContinueMove,
-        moveResult: MoveResult.InvalidMove,
-      });
+      expect(service.move(MoveDirection.Left).moveResult).toEqual(MoveResult.InvalidMove);
       assertPositionIs(1, 6);
     })
 
@@ -191,10 +185,7 @@ describe('GameBoard', () => {
       service.move(MoveDirection.Up);
       assertPositionIs(3, 1);
 
-      expect(service.move(MoveDirection.Up)).toEqual({
-        gameState: GameResult.ContinueMove,
-        moveResult: MoveResult.InvalidMove,
-      });
+      expect(service.move(MoveDirection.Up).moveResult).toEqual(MoveResult.InvalidMove);
       assertPositionIs(3, 1);
     })
 
@@ -206,10 +197,7 @@ describe('GameBoard', () => {
       service.move(MoveDirection.Down);
       assertPositionIs(7, 11);
 
-      expect(service.move(MoveDirection.Down)).toEqual({
-        gameState: GameResult.ContinueMove,
-        moveResult: MoveResult.InvalidMove,
-      });
+      expect(service.move(MoveDirection.Down).moveResult).toEqual(MoveResult.InvalidMove);
       assertPositionIs(7, 11);
     })
   })
@@ -224,12 +212,8 @@ describe('GameBoard', () => {
       service.move(MoveDirection.Left);
       assertPositionIs(1, 6);
 
-      expect(service.move(MoveDirection.Up)).toEqual({
-        gameState: GameResult.ContinueMove,
-        moveResult: MoveResult.AlreadyTaken,
-      });
+      expect(service.move(MoveDirection.Up).moveResult).toEqual(MoveResult.AlreadyTaken);
     })
-
 
     it('right border should be drawn', () => {
       service.move(MoveDirection.Right);
@@ -238,10 +222,7 @@ describe('GameBoard', () => {
       service.move(MoveDirection.Right);
       assertPositionIs(9, 6);
 
-      expect(service.move(MoveDirection.Up)).toEqual({
-        gameState: GameResult.ContinueMove,
-        moveResult: MoveResult.AlreadyTaken,
-      });
+      expect(service.move(MoveDirection.Up).moveResult).toEqual(MoveResult.AlreadyTaken);
     })
 
     it('bottom left border should be drawn', () => {
@@ -252,25 +233,16 @@ describe('GameBoard', () => {
       service.move(MoveDirection.Down);
       assertPositionIs(4, 11);
 
-      expect(service.move(MoveDirection.Left)).toEqual({
-        gameState: GameResult.ContinueMove,
-        moveResult: MoveResult.AlreadyTaken,
-      });
+      expect(service.move(MoveDirection.Left).moveResult).toEqual(MoveResult.AlreadyTaken);
       assertPositionIs(4, 11);
       
       service.move(MoveDirection.UpLeft)
       service.move(MoveDirection.Down)
-      expect(service.move(MoveDirection.Left)).toEqual({
-        gameState: GameResult.ContinueMove,
-        moveResult: MoveResult.AlreadyTaken,
-      });
+      expect(service.move(MoveDirection.Left).moveResult).toEqual(MoveResult.AlreadyTaken);
 
       service.move(MoveDirection.UpLeft)
-      expect(service.move(MoveDirection.Down).moveResult).toEqual(MoveResult.Moved)
-      expect(service.move(MoveDirection.Left)).toEqual({
-        gameState: GameResult.ContinueMove,
-        moveResult: MoveResult.AlreadyTaken,
-      });
+      expect(service.move(MoveDirection.Down).moveResult).toEqual(MoveResult.Moved);
+      expect(service.move(MoveDirection.Left).moveResult).toEqual(MoveResult.AlreadyTaken);
 
       service.move(MoveDirection.UpLeft)
       expect(service.move(MoveDirection.Down).moveResult).toEqual(MoveResult.AlreadyTaken)
@@ -287,26 +259,16 @@ describe('GameBoard', () => {
 
       service.move(MoveDirection.Left);
       assertPositionIs(4, 11);
-      expect(service.move(MoveDirection.Left)).toEqual({
-        gameState: GameResult.ContinueMove,
-        moveResult: MoveResult.AlreadyTaken,
-      });
-      expect(service.move(MoveDirection.Down)).toEqual({
-        gameState: GameResult.ContinueMove,
-        moveResult: MoveResult.AlreadyTaken,
-      });
+
+      expect(service.move(MoveDirection.Left).moveResult).toEqual(MoveResult.AlreadyTaken);
+      expect(service.move(MoveDirection.Down).moveResult).toEqual(MoveResult.AlreadyTaken);
+
       service.move(MoveDirection.UpRight)
       service.move(MoveDirection.DownRight)
       assertPositionIs(6, 11);
 
-      expect(service.move(MoveDirection.Right)).toEqual({
-        gameState: GameResult.ContinueMove,
-        moveResult: MoveResult.AlreadyTaken,
-      });
-      expect(service.move(MoveDirection.Down)).toEqual({
-        gameState: GameResult.ContinueMove,
-        moveResult: MoveResult.AlreadyTaken,
-      });
+      expect(service.move(MoveDirection.Right).moveResult).toEqual(MoveResult.AlreadyTaken);
+      expect(service.move(MoveDirection.Down).moveResult).toEqual(MoveResult.AlreadyTaken);
     })
 
     it('bottom right border should be drawn', () => {
@@ -317,25 +279,16 @@ describe('GameBoard', () => {
       service.move(MoveDirection.Down);
       assertPositionIs(6, 11);
 
-      expect(service.move(MoveDirection.Right)).toEqual({
-        gameState: GameResult.ContinueMove,
-        moveResult: MoveResult.AlreadyTaken,
-      });
+      expect(service.move(MoveDirection.Right).moveResult).toEqual(MoveResult.AlreadyTaken);
       assertPositionIs(6, 11);
       
       service.move(MoveDirection.UpRight)
       service.move(MoveDirection.Down)
-      expect(service.move(MoveDirection.Right)).toEqual({
-        gameState: GameResult.ContinueMove,
-        moveResult: MoveResult.AlreadyTaken,
-      });
+      expect(service.move(MoveDirection.Right).moveResult).toEqual(MoveResult.AlreadyTaken);
 
       service.move(MoveDirection.UpRight)
       expect(service.move(MoveDirection.Down).moveResult).toEqual(MoveResult.Moved)
-      expect(service.move(MoveDirection.Right)).toEqual({
-        gameState: GameResult.ContinueMove,
-        moveResult: MoveResult.AlreadyTaken,
-      });
+      expect(service.move(MoveDirection.Right).moveResult).toEqual(MoveResult.AlreadyTaken);
 
       service.move(MoveDirection.UpRight)
       expect(service.move(MoveDirection.Down).moveResult).toEqual(MoveResult.AlreadyTaken)
@@ -350,25 +303,16 @@ describe('GameBoard', () => {
       service.move(MoveDirection.Up);
       assertPositionIs(4, 1);
 
-      expect(service.move(MoveDirection.Left)).toEqual({
-        gameState: GameResult.ContinueMove,
-        moveResult: MoveResult.AlreadyTaken,
-      });
+      expect(service.move(MoveDirection.Left).moveResult).toEqual(MoveResult.AlreadyTaken);
       assertPositionIs(4, 1);
       
       service.move(MoveDirection.DownLeft)
       service.move(MoveDirection.Up)
-      expect(service.move(MoveDirection.Left)).toEqual({
-        gameState: GameResult.ContinueMove,
-        moveResult: MoveResult.AlreadyTaken,
-      });
+      expect(service.move(MoveDirection.Left).moveResult).toEqual(MoveResult.AlreadyTaken);
 
       service.move(MoveDirection.DownLeft)
       expect(service.move(MoveDirection.Up).moveResult).toEqual(MoveResult.Moved)
-      expect(service.move(MoveDirection.Left)).toEqual({
-        gameState: GameResult.ContinueMove,
-        moveResult: MoveResult.AlreadyTaken,
-      });
+      expect(service.move(MoveDirection.Left).moveResult).toEqual(MoveResult.AlreadyTaken);
 
       service.move(MoveDirection.DownLeft)
       expect(service.move(MoveDirection.Up).moveResult).toEqual(MoveResult.AlreadyTaken)
@@ -385,26 +329,16 @@ describe('GameBoard', () => {
 
       service.move(MoveDirection.Left);
       assertPositionIs(4, 1);
-      expect(service.move(MoveDirection.Left)).toEqual({
-        gameState: GameResult.ContinueMove,
-        moveResult: MoveResult.AlreadyTaken,
-      });
-      expect(service.move(MoveDirection.Up)).toEqual({
-        gameState: GameResult.ContinueMove,
-        moveResult: MoveResult.AlreadyTaken,
-      });
+
+      expect(service.move(MoveDirection.Left).moveResult).toEqual(MoveResult.AlreadyTaken);
+      expect(service.move(MoveDirection.Up).moveResult).toEqual(MoveResult.AlreadyTaken);
+
       service.move(MoveDirection.DownRight)
       service.move(MoveDirection.UpRight)
       assertPositionIs(6, 1);
 
-      expect(service.move(MoveDirection.Right)).toEqual({
-        gameState: GameResult.ContinueMove,
-        moveResult: MoveResult.AlreadyTaken,
-      });
-      expect(service.move(MoveDirection.Up)).toEqual({
-        gameState: GameResult.ContinueMove,
-        moveResult: MoveResult.AlreadyTaken,
-      });
+      expect(service.move(MoveDirection.Right).moveResult).toEqual(MoveResult.AlreadyTaken);
+      expect(service.move(MoveDirection.Up).moveResult).toEqual(MoveResult.AlreadyTaken);
     })
   })
 

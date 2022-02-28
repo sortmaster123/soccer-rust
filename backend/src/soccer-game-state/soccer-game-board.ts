@@ -1,4 +1,4 @@
-import {MoveResponse, MoveDirection, MoveResult, GameResult} from '../models/models';
+import {MoveResponse, MoveDirection, MoveResult} from '../models/models';
 
 type Point = {
   x: number;
@@ -17,7 +17,7 @@ export class GameBoard {
   private boardSizeY = 9;
   private curPos: Point;
 
-  private playerOnTheMove: 'P1' | 'P2' = 'P1';
+  private playerOnTheMove: 'P1OnTheMove' | 'P2OnTheMove' = 'P1OnTheMove';
 
   private vertical: boolean[][];
   private horizontal: boolean[][];
@@ -78,7 +78,7 @@ export class GameBoard {
   }
 
   private flipPlayer(){
-    this.playerOnTheMove = this.playerOnTheMove == 'P1' ? 'P2' : 'P1'
+    this.playerOnTheMove = this.playerOnTheMove == 'P1OnTheMove' ? 'P2OnTheMove' : 'P1OnTheMove'
   }
 
   move(moveDir: MoveDirection): MoveResponse {
@@ -91,7 +91,7 @@ export class GameBoard {
     if(this.isEdgeMarked(edge)){
       return {
         moveResult: MoveResult.AlreadyTaken,
-        gameState: GameResult.ContinueMove,
+        gameState: this.getPlayerOnTheMove(),
       };
     }
     this.markEdge(edge)
@@ -110,7 +110,7 @@ export class GameBoard {
 
     return {
       moveResult: MoveResult.Moved,
-      gameState: GameResult.ContinueMove,
+      gameState: this.getPlayerOnTheMove(),
     };
   }
 
@@ -124,15 +124,15 @@ export class GameBoard {
 
     if(newPoint.x > 9 || newPoint.x < 1){
       return {
-        gameState: GameResult.ContinueMove,
         moveResult: MoveResult.InvalidMove,
+        gameState: this.getPlayerOnTheMove(),
       }
     }
 
     if((newPoint.y < 1 || newPoint.y > 11) && newPoint.x != 4 && newPoint.x != 5 && newPoint.x !== 6){
       return {
-        gameState: GameResult.ContinueMove,
         moveResult: MoveResult.InvalidMove,
+        gameState: this.getPlayerOnTheMove(),
       }
     }
 
@@ -149,14 +149,14 @@ export class GameBoard {
     if(curPos.y == 0){
       return {
         moveResult: MoveResult.Moved,
-        gameState: GameResult.P1Win,
+        gameState: 'P1Win',
       }
     }
 
     if(curPos.y == 12){
       return {
         moveResult: MoveResult.Moved,
-        gameState: GameResult.P2Win,
+        gameState: 'P2Win',
       }
     }
     return undefined;
