@@ -1,42 +1,14 @@
-export {}
+import {MoveResponse, MoveDirection, MoveResult, GameResult} from '../models/models';
+
 type Point = {
   x: number;
   y: number;
-}
-
-export enum MoveDirection {
-  Up = "Up",
-  Down = "Down",
-  Left = "Left",
-  Right = "Right", 
-  UpLeft = "UpLeft", 
-  UpRight = "UpRight",
-  DownLeft = "DownLeft",
-  DownRight = "DownRight"
-}
-
-export enum MoveResult {
-  AlreadyTaken = 'AlreadyTaken',
-  Moved = 'Moved',
-  InvalidMove = 'InvalidMove',
-}
-
-export enum GameResult {
-  SwitchPlayers = 'SwitchPlayers',
-  ContinueMove = 'ContinueMove',
-  P1Win = 'P1Win',
-  P2Win = 'P2Win',
 }
 
 type EdgeLocation = {
   edgesArray: boolean[][];
   x: number;
   y: number;
-}
-
-export type MoveResponse = {
-  moveResult: MoveResult,
-  gameState: GameResult,
 }
 
 export class GameBoard {
