@@ -1,6 +1,3 @@
-import { check } from "prettier";
-import { Direction } from "readline";
-
 type Point = {
   x: number;
   y: number;
@@ -20,7 +17,7 @@ export enum MoveDirection {
 export enum MoveResult {
   AlreadyTaken = 'AlreadyTaken',
   Moved = 'Moved',
-  InvalidMove = 'InvalidMove'
+  InvalidMove = 'InvalidMove',
 }
 
 export enum GameResult {
@@ -70,19 +67,21 @@ export class GameBoard {
   }
 
   move(moveDir: MoveDirection): MoveResponse {
-    if(this.isEdgeAlreadyMarked(moveDir)){
-      return {
-        moveResult: MoveResult.AlreadyTaken,
-        gameState: GameResult.ContinueMove,
-      };
-    }
-
     let legality = this.checkIfMoveIsInBounds(moveDir)
     if(legality != undefined){
       return legality;
     }
 
-    this.markEdge(moveDir);
+    let edgeData = this.getEdge(moveDir);
+    
+    if(edgeData.edgesArray[edgeData.x][edgeData.y]) {
+      return {
+        moveResult: MoveResult.AlreadyTaken,
+        gameState: GameResult.ContinueMove,
+      };
+    }
+    
+    edgeData.edgesArray[edgeData.x][edgeData.y] = true;
     
     let offsets = this.directionToOffset(moveDir);
     this.movePoint(offsets.x, offsets.y);
@@ -150,28 +149,6 @@ export class GameBoard {
     return {...this.curPos};
   }
 
-  private isEdgeAlreadyMarked(moveDir: MoveDirection): boolean {
-    switch(moveDir){
-      case MoveDirection.Up:
-        return this.vertical[this.curPos.x][this.curPos.y];
-      case MoveDirection.Down:
-        return this.vertical[this.curPos.x][this.curPos.y + 1];
-      case MoveDirection.Right:
-        return this.horizontal[this.curPos.x][this.curPos.y];
-      case MoveDirection.Left:
-        return this.horizontal[this.curPos.x - 1][this.curPos.y];
-      case MoveDirection.UpRight:
-        return this.slash[this.curPos.x][this.curPos.y];
-      case MoveDirection.DownLeft:
-        return this.slash[this.curPos.x - 1][this.curPos.y + 1];
-      case MoveDirection.UpLeft:
-        return this.backslash[this.curPos.x][this.curPos.y];
-      case MoveDirection.DownRight:
-        return this.backslash[this.curPos.x + 1][this.curPos.y + 1];
-    }
-    return false;
-  }
-
   private directionToOffset(moveDirection: MoveDirection): Point {
     switch(moveDirection){
       case MoveDirection.Up:
@@ -198,32 +175,56 @@ export class GameBoard {
     console.log('moved ', this.getCords())
   }
 
-  private markEdge(moveDir: MoveDirection) {
-    switch(moveDir){
+  private getEdge(moveDirection: MoveDirection) {
+    switch(moveDirection){
       case MoveDirection.Up:
-        this.vertical[this.curPos.x][this.curPos.y] = true;
-        break;
+        return {
+          edgesArray: this.vertical,
+          x: this.curPos.x,
+          y: this.curPos.y,
+        };
       case MoveDirection.Down:
-        this.vertical[this.curPos.x][this.curPos.y + 1] = true;
-        break;
+        return {
+          edgesArray: this.vertical,
+          x: this.curPos.x,
+          y: this.curPos.y + 1,
+        };
       case MoveDirection.Right:
-        this.horizontal[this.curPos.x][this.curPos.y] = true;
-        break;
+        return {
+          edgesArray: this.horizontal,
+          x: this.curPos.x,
+          y: this.curPos.y,
+        };
       case MoveDirection.Left:
-        this.horizontal[this.curPos.x - 1][this.curPos.y] = true;
-        break;
+        return {
+          edgesArray: this.horizontal,
+          x: this.curPos.x - 1,
+          y: this.curPos.y,
+        };
       case MoveDirection.UpRight:
-        this.slash[this.curPos.x][this.curPos.y] = true;
-        break;
+        return {
+          edgesArray: this.slash,
+          x: this.curPos.x,
+          y: this.curPos.y,
+        };
       case MoveDirection.DownLeft:
-        this.slash[this.curPos.x - 1][this.curPos.y + 1] = true;
-        break;
+        return {
+          edgesArray: this.slash,
+          x: this.curPos.x - 1,
+          y: this.curPos.y + 1,
+        };
       case MoveDirection.UpLeft:
-        this.backslash[this.curPos.x][this.curPos.y] = true;
-        break;
+        return {
+          edgesArray: this.backslash,
+          x: this.curPos.x,
+          y: this.curPos.y,
+        };
       case MoveDirection.DownRight:
-        this.backslash[this.curPos.x + 1][this.curPos.y + 1] = true;
-        break;
+        return {
+          edgesArray: this.backslash,
+          x: this.curPos.x + 1,
+          y: this.curPos.y + 1,
+        };
     }
   }
 }
