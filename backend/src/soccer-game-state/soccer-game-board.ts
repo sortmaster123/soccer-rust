@@ -1,3 +1,4 @@
+export {}
 type Point = {
   x: number;
   y: number;
@@ -25,6 +26,12 @@ export enum GameResult {
   ContinueMove = 'ContinueMove',
   P1Win = 'P1Win',
   P2Win = 'P2Win',
+}
+
+type EdgeLocation = {
+  edgesArray: boolean[][];
+  x: number;
+  y: number;
 }
 
 export type MoveResponse = {
@@ -64,6 +71,34 @@ export class GameBoard {
       }
     }
     console.log('start game point in ', this.getCords())
+    this.drawBorders();
+  }
+
+  private drawBorders(){
+    for(let i = 11; i > 0; i--){
+      // side borders
+      this.markEdge(this.getEdgeLocation({x: 1, y: i}, MoveDirection.Up))
+      this.markEdge(this.getEdgeLocation({x: 9, y: i}, MoveDirection.Up))
+    }
+
+    for(let i = 1; i < 4; i++){
+      // top and down left borders
+      this.markEdge(this.getEdgeLocation({x: i, y: 11}, MoveDirection.Right))
+      this.markEdge(this.getEdgeLocation({x: i, y: 1}, MoveDirection.Right))
+    }
+
+    //goal borders
+    this.markEdge(this.getEdgeLocation({x: 4, y: 11}, MoveDirection.Down))
+    this.markEdge(this.getEdgeLocation({x: 6, y: 11}, MoveDirection.Down))
+    this.markEdge(this.getEdgeLocation({x: 4, y: 1}, MoveDirection.Up))
+    this.markEdge(this.getEdgeLocation({x: 6, y: 1}, MoveDirection.Up))
+
+
+    for(let i = 6; i < 9; i++){
+      // top and down right borders
+      this.markEdge(this.getEdgeLocation({x: i, y: 11}, MoveDirection.Right))
+      this.markEdge(this.getEdgeLocation({x: i, y: 1}, MoveDirection.Right))
+    }
   }
 
   move(moveDir: MoveDirection): MoveResponse {
@@ -72,16 +107,14 @@ export class GameBoard {
       return legality;
     }
 
-    let edgeData = this.getEdge(moveDir);
-    
-    if(edgeData.edgesArray[edgeData.x][edgeData.y]) {
+    let edge = this.getEdgeLocationFromCurrentPoint(moveDir);
+    if(this.isEdgeMarked(edge)){
       return {
         moveResult: MoveResult.AlreadyTaken,
         gameState: GameResult.ContinueMove,
       };
     }
-    
-    edgeData.edgesArray[edgeData.x][edgeData.y] = true;
+    this.markEdge(edge)
     
     let offsets = this.directionToOffset(moveDir);
     this.movePoint(offsets.x, offsets.y);
@@ -172,58 +205,69 @@ export class GameBoard {
 
   private movePoint(xOffset: number, yOffset: number){
     this.curPos = {x: this.curPos.x + xOffset , y: this.curPos.y + yOffset }
-    console.log('moved ', this.getCords())
   }
 
-  private getEdge(moveDirection: MoveDirection) {
+  private isEdgeMarked(edgeLocation: EdgeLocation): boolean {
+    return edgeLocation.edgesArray[edgeLocation.x][edgeLocation.y];
+  }
+
+  private markEdge(edgeLocation: EdgeLocation) {
+    edgeLocation.edgesArray[edgeLocation.x][edgeLocation.y] = true;
+  }
+
+  private getEdgeLocationFromCurrentPoint(moveDirection: MoveDirection): EdgeLocation {
+    return this.getEdgeLocation(this.getCords(), moveDirection);
+  }
+
+  private getEdgeLocation(startingPoint: Point, moveDirection: MoveDirection): EdgeLocation {
     switch(moveDirection){
       case MoveDirection.Up:
         return {
           edgesArray: this.vertical,
-          x: this.curPos.x,
-          y: this.curPos.y,
+          x: startingPoint.x,
+          y: startingPoint.y,
         };
       case MoveDirection.Down:
         return {
           edgesArray: this.vertical,
-          x: this.curPos.x,
-          y: this.curPos.y + 1,
+          x: startingPoint.x,
+          y: startingPoint.y + 1,
         };
       case MoveDirection.Right:
         return {
           edgesArray: this.horizontal,
-          x: this.curPos.x,
-          y: this.curPos.y,
+          x: startingPoint.x,
+          y: startingPoint.y,
         };
       case MoveDirection.Left:
         return {
           edgesArray: this.horizontal,
-          x: this.curPos.x - 1,
-          y: this.curPos.y,
+          x: startingPoint.x - 1,
+          y: startingPoint.y,
         };
       case MoveDirection.UpRight:
         return {
           edgesArray: this.slash,
-          x: this.curPos.x,
-          y: this.curPos.y,
+          x: startingPoint.x,
+          y: startingPoint.y,
         };
       case MoveDirection.DownLeft:
         return {
           edgesArray: this.slash,
-          x: this.curPos.x - 1,
-          y: this.curPos.y + 1,
+          x: startingPoint.x - 1,
+          y: startingPoint.y + 1,
         };
       case MoveDirection.UpLeft:
         return {
           edgesArray: this.backslash,
-          x: this.curPos.x,
-          y: this.curPos.y,
+          x: startingPoint.x,
+          y: startingPoint.y,
         };
       case MoveDirection.DownRight:
         return {
           edgesArray: this.backslash,
-          x: this.curPos.x + 1,
-          y: this.curPos.y + 1,
+          x: startingPoint.x + 1,
+          y: startingPoint.y + 1,
         };
     }
   }
