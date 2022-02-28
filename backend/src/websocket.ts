@@ -8,7 +8,8 @@ import {
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Server } from 'socket.io';
-import { GameBoard, GameResult, MoveDirection, MoveResult } from './soccer-game-state/soccer-game-board';
+import { GameResult, MoveDirection, MoveResult } from './models/models';
+import { GameBoard } from './soccer-game-state/soccer-game-board';
 
 type MoveRequest = {
   moveDirection: MoveDirection;

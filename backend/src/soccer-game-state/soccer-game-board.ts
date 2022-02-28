@@ -269,17 +269,16 @@ export class GameBoard {
       this.markEdge(this.getEdgeLocation({x: i, y: 1}, MoveDirection.Right))
     }
 
-    //goal borders
-    this.markEdge(this.getEdgeLocation({x: 4, y: 11}, MoveDirection.Down))
-    this.markEdge(this.getEdgeLocation({x: 6, y: 11}, MoveDirection.Down))
-    this.markEdge(this.getEdgeLocation({x: 4, y: 1}, MoveDirection.Up))
-    this.markEdge(this.getEdgeLocation({x: 6, y: 1}, MoveDirection.Up))
-
-
     for(let i = 6; i < 9; i++){
       // top and down right borders
       this.markEdge(this.getEdgeLocation({x: i, y: 11}, MoveDirection.Right))
       this.markEdge(this.getEdgeLocation({x: i, y: 1}, MoveDirection.Right))
     }
+
+    //goal borders
+    this.markEdge(this.getEdgeLocation({x: 4, y: 11}, MoveDirection.Down))
+    this.markEdge(this.getEdgeLocation({x: 6, y: 11}, MoveDirection.Down))
+    this.markEdge(this.getEdgeLocation({x: 4, y: 1}, MoveDirection.Up))
+    this.markEdge(this.getEdgeLocation({x: 6, y: 1}, MoveDirection.Up))
   }
 }
