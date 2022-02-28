@@ -17,6 +17,8 @@ export class GameBoard {
   private boardSizeY = 9;
   private curPos: Point;
 
+  private playerOnTheMove: 'P1' | 'P2' = 'P1';
+
   private vertical: boolean[][];
   private horizontal: boolean[][];
   private backslash: boolean[][];
@@ -46,35 +48,41 @@ export class GameBoard {
     this.drawBorders();
   }
 
-  private drawBorders(){
-    for(let i = 11; i > 0; i--){
-      // side borders
-      this.markEdge(this.getEdgeLocation({x: 1, y: i}, MoveDirection.Up))
-      this.markEdge(this.getEdgeLocation({x: 9, y: i}, MoveDirection.Up))
+  getPlayerOnTheMove(){
+    return this.playerOnTheMove;
+  }
+
+  private isPointPreviouslyVisited(): boolean {
+    let directions = [
+      MoveDirection.Down,
+      MoveDirection.DownLeft,
+      MoveDirection.Left,
+      MoveDirection.UpLeft,
+      MoveDirection.Up,
+      MoveDirection.UpRight,
+      MoveDirection.Right,
+      MoveDirection.DownRight,
+    ];
+
+    let markedEdgesSum = 0;
+    for(let direction of directions){
+      if(this.isEdgeMarked(this.getEdgeLocationFromCurrentPoint(direction))){
+        markedEdgesSum += 1;
+        if(markedEdgesSum > 1){
+          return true
+        }
+      }
     }
 
-    for(let i = 1; i < 4; i++){
-      // top and down left borders
-      this.markEdge(this.getEdgeLocation({x: i, y: 11}, MoveDirection.Right))
-      this.markEdge(this.getEdgeLocation({x: i, y: 1}, MoveDirection.Right))
-    }
+    return false
+  }
 
-    //goal borders
-    this.markEdge(this.getEdgeLocation({x: 4, y: 11}, MoveDirection.Down))
-    this.markEdge(this.getEdgeLocation({x: 6, y: 11}, MoveDirection.Down))
-    this.markEdge(this.getEdgeLocation({x: 4, y: 1}, MoveDirection.Up))
-    this.markEdge(this.getEdgeLocation({x: 6, y: 1}, MoveDirection.Up))
-
-
-    for(let i = 6; i < 9; i++){
-      // top and down right borders
-      this.markEdge(this.getEdgeLocation({x: i, y: 11}, MoveDirection.Right))
-      this.markEdge(this.getEdgeLocation({x: i, y: 1}, MoveDirection.Right))
-    }
+  private flipPlayer(){
+    this.playerOnTheMove = this.playerOnTheMove == 'P1' ? 'P2' : 'P1'
   }
 
   move(moveDir: MoveDirection): MoveResponse {
-    let legality = this.checkIfMoveIsInBounds(moveDir)
+    let legality = this.isMoveInBounds(moveDir)
     if(legality != undefined){
       return legality;
     }
@@ -96,13 +104,17 @@ export class GameBoard {
       return hasWin;
     }
 
+    if(!this.isPointPreviouslyVisited()){
+      this.flipPlayer()
+    }
+
     return {
       moveResult: MoveResult.Moved,
       gameState: GameResult.ContinueMove,
     };
   }
 
-  private checkIfMoveIsInBounds(moveDir: MoveDirection): MoveResponse | undefined {
+  private isMoveInBounds(moveDir: MoveDirection): MoveResponse | undefined {
     let curPoint = this.getCords()
     let offset = this.directionToOffset(moveDir)
     let newPoint = {
@@ -241,6 +253,33 @@ export class GameBoard {
           x: startingPoint.x + 1,
           y: startingPoint.y + 1,
         };
+    }
+  }
+
+  private drawBorders(){
+    for(let i = 11; i > 0; i--){
+      // side borders
+      this.markEdge(this.getEdgeLocation({x: 1, y: i}, MoveDirection.Up))
+      this.markEdge(this.getEdgeLocation({x: 9, y: i}, MoveDirection.Up))
+    }
+
+    for(let i = 1; i < 4; i++){
+      // top and down left borders
+      this.markEdge(this.getEdgeLocation({x: i, y: 11}, MoveDirection.Right))
+      this.markEdge(this.getEdgeLocation({x: i, y: 1}, MoveDirection.Right))
+    }
+
+    //goal borders
+    this.markEdge(this.getEdgeLocation({x: 4, y: 11}, MoveDirection.Down))
+    this.markEdge(this.getEdgeLocation({x: 6, y: 11}, MoveDirection.Down))
+    this.markEdge(this.getEdgeLocation({x: 4, y: 1}, MoveDirection.Up))
+    this.markEdge(this.getEdgeLocation({x: 6, y: 1}, MoveDirection.Up))
+
+
+    for(let i = 6; i < 9; i++){
+      // top and down right borders
+      this.markEdge(this.getEdgeLocation({x: i, y: 11}, MoveDirection.Right))
+      this.markEdge(this.getEdgeLocation({x: i, y: 1}, MoveDirection.Right))
     }
   }
 }

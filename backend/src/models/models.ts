@@ -1,1 +1,1 @@
-export * from "./MoveResponse";
+export * from "./move-response";

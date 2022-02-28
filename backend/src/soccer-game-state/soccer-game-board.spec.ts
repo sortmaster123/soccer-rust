@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { GameBoard, GameResult, MoveDirection, MoveResult } from './soccer-game-board';
+import { GameBoard } from './soccer-game-board';
+import { GameResult, MoveDirection, MoveResult } from '../models/models';
 
 describe('GameBoard', () => {
   let service: GameBoard;
@@ -50,6 +51,44 @@ describe('GameBoard', () => {
           gameState: GameResult.P2Win,
       });
     });
+  })
+
+  describe('player on the move', () => {
+    beforeEach(() => service.initializeGame())
+    
+    it('should flip player after move to unvisited node', () => {
+      expect(service.getPlayerOnTheMove()).toEqual('P1')
+      service.move(MoveDirection.Up)
+      expect(service.getPlayerOnTheMove()).toEqual('P2')
+      service.move(MoveDirection.Up)
+      expect(service.getPlayerOnTheMove()).toEqual('P1')
+      service.move(MoveDirection.Right)
+      expect(service.getPlayerOnTheMove()).toEqual('P2')
+      service.move(MoveDirection.Down)
+      expect(service.getPlayerOnTheMove()).toEqual('P1')
+    })
+
+    it('should not flip player after move to visited node', () => {
+      expect(service.getPlayerOnTheMove()).toEqual('P1')
+      service.move(MoveDirection.Up)
+      expect(service.getPlayerOnTheMove()).toEqual('P2')
+      service.move(MoveDirection.Left)
+      expect(service.getPlayerOnTheMove()).toEqual('P1')
+      service.move(MoveDirection.DownRight)
+      expect(service.getPlayerOnTheMove()).toEqual('P1')
+    })
+
+    it('should not flip player after move to border', () => {
+      expect(service.getPlayerOnTheMove()).toEqual('P1')
+      service.move(MoveDirection.Right)
+      expect(service.getPlayerOnTheMove()).toEqual('P2')
+      service.move(MoveDirection.Right)
+      expect(service.getPlayerOnTheMove()).toEqual('P1')
+      service.move(MoveDirection.Right).moveResult
+      expect(service.getPlayerOnTheMove()).toEqual('P2')
+      service.move(MoveDirection.Right)
+      expect(service.getPlayerOnTheMove()).toEqual('P2')
+    })
   })
 
 
