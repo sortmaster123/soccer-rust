@@ -1,8 +1,7 @@
-import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { Actions, ofActionSuccessful, Store } from '@ngxs/store';
 import { tap } from 'rxjs';
 import { CanvasHelperService } from '../canvas-helper.service';
-import { SocketService } from '../socket.service';
 import { DrawMove, InitializeGame } from '../store/game-state.actions';
 
 export type Point = {
@@ -35,7 +34,6 @@ export class PitchComponent implements AfterViewInit {
   private canvasHelper?: CanvasHelperService = undefined;
 
   constructor(
-    private readonly socketService: SocketService,
     private readonly store: Store,
     private readonly actions$: Actions,
   ) {
@@ -48,30 +46,7 @@ export class PitchComponent implements AfterViewInit {
       .subscribe();
   }
 
-  private keyToAction(key: string): MoveDirection | undefined {
-    switch(key) {
-      case 'ArrowDown':
-        return MoveDirection.Down;
-      case 'ArrowUp':
-        return MoveDirection.Up;
-      case 'ArrowLeft':
-        return MoveDirection.Left;
-      case 'ArrowRight':
-        return MoveDirection.Right;
-      case 'PageDown':
-        return MoveDirection.DownRight;
-      case 'PageUp':
-        return MoveDirection.UpRight;
-      case 'End':
-        return MoveDirection.DownLeft;
-      case 'Home':
-        return MoveDirection.UpLeft;
-    }
-    return undefined;
-  }
-
   private moveDirection(moveDirection: MoveDirection) {
-    console.log('moving in direction', moveDirection)
     this.markAMove(moveDirection);
     this.getCtx().stroke()
   }
@@ -110,29 +85,12 @@ export class PitchComponent implements AfterViewInit {
 
       this.initialized = true;
     }
-
-    this.socketService.connect();
-    this.socketService.requestNewGame();
-  }
-
-  // TODO: move to main component and process in store
-  @HostListener('window:keyup', ['$event'])
-  keyEvent(event: KeyboardEvent) {
-    let action = this.keyToAction(event.key);
-    if(action == undefined){
-      return;
-    }
-    this.checkIfMoveIsLegal(action);
   }
 
   private move(xOffset: number, yOffset: number): boolean{
     this.canvasHelper?.drawLine(this.currentPoint.x, this.currentPoint.y, this.currentPoint.x+ xOffset, this.currentPoint.y + yOffset);
     this.currentPoint = {x: this.currentPoint.x + xOffset, y: this.currentPoint.y + yOffset};
     return true;
-  }
-
-  private checkIfMoveIsLegal(moveDir: MoveDirection){
-    this.socketService.tryMove(moveDir);
   }
 
   private initializeHelper(){

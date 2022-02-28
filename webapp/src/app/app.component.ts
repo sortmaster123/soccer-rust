@@ -1,6 +1,6 @@
-import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
-import { tap } from 'rxjs';
+import { Component, HostListener } from '@angular/core';
+import { Store } from '@ngxs/store';
+import { KeyPressed } from './store/game-state.actions';
 
 @Component({
   selector: 'app-root',
@@ -8,11 +8,12 @@ import { tap } from 'rxjs';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  constructor(httpClient: HttpClient) {
-    httpClient.get('http://localhost:3000').pipe(
-      tap(result => console.log(result)),
-    ).subscribe()
+
+  constructor(private readonly store: Store) {}
+
+  @HostListener('window:keyup', ['$event'])
+  keyEvent(event: KeyboardEvent) {
+    console.log('key pressed')
+    this.store.dispatch(new KeyPressed(event.key));
   }
-
-
 }

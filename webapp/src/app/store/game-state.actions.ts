@@ -20,3 +20,13 @@ export class DeclareWin {
   static readonly type = '[GameState] Declare Win';
   constructor() {}
 }
+
+export class KeyPressed {
+  static readonly type = '[GameState] Key Pressed'
+  constructor(public key: string) {}
+}
+
+export class SendMoveRequest {
+  static readonly type = '[GameState] Send Move Request'
+  constructor(public moveDirection: MoveDirection) {}
+}
