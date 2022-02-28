@@ -20,6 +20,7 @@ export type MoveResponse = {
 export enum MoveResult {
   AlreadyTaken = 'AlreadyTaken',
   Moved = 'Moved',
+  InvalidMove = 'InvalidMove',
 }
 
 @Injectable({
