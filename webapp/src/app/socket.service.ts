@@ -4,17 +4,10 @@ import { io, Socket } from 'socket.io-client';
 import { MoveDirection } from './pitch/pitch.component';
 import { ReceiveMove } from './store/game-state.actions';
 
-export enum GameResult {
-  SwitchPlayers = 'SwitchPlayers',
-  ContinueMove = 'ContinueMove',
-  P1Win = 'P1Win',
-  P2Win = 'P2Win',
-}
-
 export type MoveResponse = {
-  moveResult: MoveResult;
-  moveDirection: MoveDirection;
-  gameState: GameResult;
+  moveResult: MoveResult,
+  gameState: 'P1Win' | 'P2Win' | 'P1OnTheMove' | 'P2OnTheMove',
+  moveDirection: MoveDirection,
 }
 
 export enum MoveResult {
@@ -41,6 +34,7 @@ export class SocketService {
     let store = this.store;
 
     socket.on('move', function(data) {
+      console.log('socket response', data)
       store.dispatch(new ReceiveMove(data as MoveResponse));
     });
 

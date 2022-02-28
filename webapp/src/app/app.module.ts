@@ -8,11 +8,15 @@ import { PitchComponent } from './pitch/pitch.component';
 import { NgxsModule } from '@ngxs/store';
 import { environment } from 'src/environments/environment';
 import { GameState } from './store/game-state';
+import { PlayerLabelComponent } from './player-label/player-label.component';
+import { GameInProgressComponent } from './game-in-progress/game-in-progress.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    PitchComponent
+    PitchComponent,
+    PlayerLabelComponent,
+    GameInProgressComponent
   ],
   imports: [
     BrowserModule,

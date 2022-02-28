@@ -120,7 +120,6 @@ export class PitchComponent implements AfterViewInit {
   keyEvent(event: KeyboardEvent) {
     let action = this.keyToAction(event.key);
     if(action == undefined){
-      console.log('unknown key', event.key, 'registered')
       return;
     }
     this.checkIfMoveIsLegal(action);
@@ -129,7 +128,6 @@ export class PitchComponent implements AfterViewInit {
   private move(xOffset: number, yOffset: number): boolean{
     this.canvasHelper?.drawLine(this.currentPoint.x, this.currentPoint.y, this.currentPoint.x+ xOffset, this.currentPoint.y + yOffset);
     this.currentPoint = {x: this.currentPoint.x + xOffset, y: this.currentPoint.y + yOffset};
-    console.log('current point: ', this.currentPoint)
     return true;
   }
 

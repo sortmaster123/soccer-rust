@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Action, State, StateContext } from '@ngxs/store';
+import { Action, Selector, State, StateContext } from '@ngxs/store';
 import {Point} from '../pitch/pitch.component';
-import { GameResult, MoveResult } from '../socket.service';
+import { MoveResult } from '../socket.service';
 import { DeclareWin, DrawMove, InitializeGame, ReceiveMove } from './game-state.actions';
 
 export type GameStateModel = {
     currentPosition: Point;
+    playerOnTheMove: 'P1OnTheMove' | 'P2OnTheMove';
 }
 
 @State<GameStateModel>({
@@ -14,25 +15,32 @@ export type GameStateModel = {
 @Injectable()
 export class GameState {
 
+  @Selector()
+  static playerOnTheMove(state: GameStateModel) {
+    return state.playerOnTheMove;
+  }
+
   @Action(InitializeGame)
   initializeGame(ctx: StateContext<GameStateModel>) {
     ctx.setState({
       currentPosition: {x: 4, y: 5},
+      playerOnTheMove: 'P1OnTheMove',
     });
   }
 
   @Action(ReceiveMove)
   receiveMove(ctx: StateContext<GameStateModel>, action: ReceiveMove) {
-    console.log('received move: ', action)
     if(action.moveResponse.moveResult == MoveResult.Moved){
       ctx.dispatch(new DrawMove(action.moveResponse.moveDirection));
     }
 
-    console.log('log', action.moveResponse.gameState)
-
-    if(action.moveResponse.gameState == GameResult.P1Win || action.moveResponse.gameState == GameResult.P2Win){
-      console.log('declaring a win!')
+    if(action.moveResponse.gameState == 'P1Win' || action.moveResponse.gameState == 'P2Win'){
       ctx.dispatch(new DeclareWin());
+    }
+    else{
+      ctx.patchState({
+        playerOnTheMove: action.moveResponse.gameState,
+      });
     }
   }
 

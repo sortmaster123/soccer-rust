@@ -91,7 +91,6 @@ describe('GameBoard', () => {
     })
   })
 
-
   describe('move validity', () => {
 
     beforeEach(() => service.initializeGame());
